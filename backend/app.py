@@ -1,13 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-
+import requests
 from joblib import load
 import pandas as pd
+
+from flask import Flask, request, jsonify
+from openai import OpenAI
+
+from dotenv import load_dotenv
+load_dotenv()
+import requests
+import os
+from flask import jsonify
+
+
 
 print("🔥 Aarogya AI Backend Started Successfully 🔥")
 
@@ -148,6 +158,106 @@ def predict_lung_risk():
     # Hackathon-safe placeholder
     return jsonify({"risk_percentage": 45})
 
+
+
+
+import requests
+import os
+
+@app.route("/chat", methods=["POST"])
+def health_chat():
+    try:
+        data = request.get_json()
+        user_message = data.get("message")
+
+        if not user_message:
+            return jsonify({"reply": "Please enter a message."})
+
+        groq_api_key = os.environ.get("GROQ_API_KEY")
+        if not groq_api_key:
+            return jsonify({"reply": "Groq API key not set."})
+
+        headers = {
+            "Authorization": f"Bearer {groq_api_key.strip()}",
+            "Content-Type": "application/json"
+        }
+
+        json_data = {
+            "model": "llama-3.1-8b-instant", #Free + good model
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """
+                You are Aarogya AI, a responsible health assistant and blood report analyzer.
+
+                Guidelines:
+                - Keep answers short (5–8 lines max).
+                - Use simple language.
+                - Avoid too many bullet points.
+                - Only give detailed explanation if user asks.
+                - For mild symptoms, give 2–3 possible causes and simple advice.
+                - Avoid overwhelming the user.
+
+                Your responsibilities:
+
+                1. If the user describes symptoms (headache, fever, stomach ache, etc.):
+                - Give simple possible causes.
+                - Suggest safe home remedies.
+                - Do NOT immediately ask for lab reports.
+                - Only suggest doctor if symptoms are severe or persistent.
+
+                2. If the user asks about a medical term (HbA1c, LDL, CBC, etc.):
+                - Explain what it means.
+                - Give normal range.
+                - Explain risks if high or low.
+                - Suggest lifestyle improvements.
+
+                3. If the user provides blood test values:
+                - Compare against normal ranges.
+                - Identify what is out of range.
+                - Suggest diet and lifestyle improvements.
+                - Advise seeing a doctor if values are dangerously abnormal.
+
+                Rules:
+                - Do NOT give prescriptions.
+                - Do NOT give exact medicine dosages.
+                - Keep responses clear, calm, and supportive.
+                - Avoid unnecessary medical panic.
+                """
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+            "temperature": 0.4
+        }
+
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers=headers,
+            json=json_data,
+            timeout=30
+        )
+
+        result = response.json()
+
+        if "choices" in result:
+            reply = result["choices"][0]["message"]["content"]
+        else:
+            print("Groq API raw response:", result)
+            reply = "Groq did not return a valid reply."
+
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        print("Groq error:", e)
+        return jsonify({"reply": "Connection failed."})
+
+
 # ===================== RUN APP =====================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
+
+

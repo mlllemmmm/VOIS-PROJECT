@@ -15,7 +15,6 @@ export default function Quiz() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  /* ================= SAFE BACKEND CALL ================= */
   const safeFetch = async (url) => {
     const res = await fetch(url, {
       method: "POST",
@@ -30,7 +29,6 @@ export default function Quiz() {
     return res.json();
   };
 
-  /* ================= SUBMIT HANDLER ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -70,168 +68,251 @@ export default function Quiz() {
     }
   };
 
-  /* ================= PERSONALIZED HEALTH TIPS ================= */
-  const getHealthTips = (result, data) => {
-    if (!result) return [];
+const calculateBMI = (data) => {
+  const height = Number(data.height_cm);
+  const weight = Number(data.weight_kg);
 
-    const tips = [];
+  if (!height || !weight) return null;
 
-    const age = Number(data.age);
-    const bmi = Number(data.bmi);
-    const exercise = data.exercise;
-    const smoking = data.smoking;
-    const sleep = Number(data.sleep_hours);
+  const heightInMeters = height / 100;
+  const bmi = weight / (heightInMeters * heightInMeters);
 
-    if (age >= 40) {
-      tips.push(
-        "Since you are above 40, regular health checkups and blood tests are strongly recommended."
-      );
-    }
+  return bmi.toFixed(1);
+};
 
-    if (bmi >= 25) {
-      tips.push(
-        "Your BMI indicates overweight. Gradual weight loss through diet control and daily walking can reduce health risks."
-      );
-    } else if (bmi && bmi < 18.5) {
-      tips.push(
-        "Your BMI is below normal. Ensure sufficient calorie and protein intake."
-      );
-    }
 
-    if (exercise === "No") {
-      tips.push(
-        "Lack of regular physical activity increases disease risk. Start with 20–30 minutes of walking daily."
-      );
-    }
 
-    if (result.heart !== "N/A" && result.heart >= 60) {
-      tips.push(
-        "High heart disease risk detected. Reduce salt intake and monitor blood pressure regularly."
-      );
-    }
+const getHealthTips = (result, data) => {
+  if (!result) return [];
 
-    if (result.diabetes !== "N/A" && result.diabetes >= 60) {
-      tips.push(
-        "High diabetes risk detected. Limit sugar intake and consider regular glucose monitoring."
-      );
-    }
+  const tips = [];
 
-    if (data.smoking === "Yes") {
-      tips.push(
-        "Smoking significantly increases lung and heart disease risk. Quitting smoking is the most effective preventive step."
-      );
-    }
+  const age = Number(data.age);
 
-    if (result.lung !== "N/A" && result.lung >= 50) {
-      tips.push(
-        "Elevated lung health risk detected. Avoid polluted environments and practice breathing exercises."
-      );
-    }
+  let bmi = Number(data.bmi);
+  if (!bmi) {
+    const calculated = calculateBMI(data);
+    bmi = calculated ? Number(calculated) : null;
+  }
 
-    if (sleep && sleep < 6) {
-      tips.push(
-        "Insufficient sleep increases chronic disease risk. Aim for 7–8 hours of sleep daily."
-      );
-    }
+  const exercise = data.Exercise;
+  const smoking = data.Smoking_History;
+  const alcohol = data.Alcohol_Consumption;
 
+  const heartRisk = Number(result.heart);
+  const diabetesRisk = Number(result.diabetes);
+  const lungRisk = Number(result.lung);
+
+  /* ================= AGE + HIGH RISK ================= */
+
+  if (age >= 60 && (heartRisk >= 60 || diabetesRisk >= 60)) {
     tips.push(
-      "These insights are for awareness only. Please consult a medical professional for diagnosis or treatment."
+      "Considering your age and elevated risk levels, a comprehensive health evaluation is strongly recommended."
     );
+  }
 
-    return tips.slice(0, 7);
-  };
+  /* ================= BMI PERSONALIZATION ================= */
 
-  /* ================= GOOGLE MAP LINKS ================= */
+  if (bmi >= 30) {
+    tips.push(
+      "Your BMI indicates obesity. A structured weight management program with medical supervision is advised."
+    );
+  } else if (bmi >= 25) {
+    tips.push(
+      "You are overweight. Even modest weight loss can significantly reduce cardiovascular and diabetes risk."
+    );
+  } else if (bmi && bmi < 18.5) {
+    tips.push(
+      "Your BMI is below normal. Consider nutritional optimization and professional dietary guidance."
+    );
+  }
+
+  /* ================= HEART ================= */
+
+  if (heartRisk >= 75) {
+    tips.push(
+      "High heart disease risk detected. Schedule cardiac screening and monitor blood pressure regularly."
+    );
+  } else if (heartRisk >= 60) {
+    tips.push(
+      "Moderate heart risk. Reduce salt intake and incorporate regular aerobic activity."
+    );
+  }
+
+  /* ================= DIABETES ================= */
+
+  if (diabetesRisk >= 75) {
+    tips.push(
+      "High diabetes risk detected. Immediate blood glucose testing and dietary intervention are advised."
+    );
+  } else if (diabetesRisk >= 60) {
+    tips.push(
+      "Elevated diabetes risk. Reduce refined carbohydrates and increase physical activity."
+    );
+  }
+
+  /* ================= LUNG ================= */
+
+  if (lungRisk >= 70) {
+    tips.push(
+      "Elevated lung health risk. Avoid pollutants and consider respiratory evaluation."
+    );
+  }
+
+  if (smoking === "Current") {
+    tips.push(
+      "Active smoking significantly increases lung and heart risk. Smoking cessation is strongly recommended."
+    );
+  }
+
+  /* ================= LIFESTYLE ================= */
+
+  if (exercise === "No") {
+    tips.push(
+      "Regular physical activity (30 minutes daily) can significantly reduce chronic disease risk."
+    );
+  }
+
+  if (alcohol === "Frequently") {
+    tips.push(
+      "Frequent alcohol consumption increases cardiovascular and metabolic risk. Consider moderation."
+    );
+  }
+
+  /* ================= MULTI-RISK ESCALATION ================= */
+
+  if (heartRisk >= 70 && diabetesRisk >= 70) {
+    tips.push(
+      "Multiple elevated risk indicators detected. A full preventive health consultation is recommended."
+    );
+  }
+
+  /* ================= LOW RISK POSITIVE ================= */
+
+  if (heartRisk < 40 && diabetesRisk < 40 && lungRisk < 40) {
+    tips.push(
+      "Your current risk levels appear low. Maintain your healthy habits to sustain long-term wellbeing."
+    );
+  }
+
+  tips.push(
+    "These insights are for educational purposes only and do not replace professional medical diagnosis."
+  );
+
+  return tips.slice(0, 8);
+};
+
+
+
   const getMapLink = (query) =>
     `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
 
   return (
-    <div className="quiz-container">
-      <Link to="/" className="back-link">← Back to Dashboard</Link>
+    <div className="quiz-wrapper">
+      <div className="quiz-container">
+        <Link to="/" className="back-link">
+          ← Back to Dashboard
+        </Link>
 
-      <h1 className="quiz-title">Chronic Disease Risk Questionnaire</h1>
+        <h1 className="quiz-title">
+          Chronic Disease Risk Questionnaire
+        </h1>
 
-      <form className="quiz-form" onSubmit={handleSubmit}>
-        {questions.map((q) => (
-          <div key={q.id} className="quiz-field">
-            <label>{q.label}</label>
+        <form className="quiz-form" onSubmit={handleSubmit}>
+          {questions.map((q) => (
+            <div key={q.id} className="quiz-field">
+              <label>{q.label}</label>
 
-            {q.type === "select" ? (
-              <select
-                value={formData[q.id] || ""}
-                onChange={(e) => handleChange(q.id, e.target.value)}
-              >
-                <option value="">Select</option>
-                {q.options.map((op) => (
-                  <option key={op} value={op}>{op}</option>
+              {q.type === "select" ? (
+                <select
+                  value={formData[q.id] || ""}
+                  onChange={(e) => handleChange(q.id, e.target.value)}
+                >
+                  <option value="">Select</option>
+                  {q.options.map((op) => (
+                    <option key={op} value={op}>
+                      {op}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={formData[q.id] || ""}
+                  onChange={(e) => handleChange(q.id, e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                />
+              )}
+            </div>
+          ))}
+
+          <button className="submit-btn" disabled={loading}>
+            {loading ? "Analyzing..." : "Submit Questionnaire"}
+          </button>
+        </form>
+
+        {error && (
+          <div className="result-box error">
+            <p>⚠️ {error}</p>
+          </div>
+        )}
+
+        {result && (
+          <div className="result-box">
+            <div className="risk-results">
+              <div className="risk-card">
+                ❤️
+                <span>Heart Disease Risk</span>
+                <strong>{result.heart}%</strong>
+              </div>
+
+              <div className="risk-card">
+                🩸
+                <span>Diabetes Risk</span>
+                <strong>{result.diabetes}%</strong>
+              </div>
+
+              <div className="risk-card">
+                🫁
+                <span>Lung Health Risk</span>
+                <strong>{result.lung}%</strong>
+              </div>
+            </div>
+
+            <div className="tips-section">
+              <h4>🩺 Personalized Health Recommendations</h4>
+              <ul>
+                {getHealthTips(result, formData).map((tip, index) => (
+                  <li key={index}>{tip}</li>
                 ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                inputMode="numeric"
-                value={formData[q.id] || ""}
-                onChange={(e) => handleChange(q.id, e.target.value)}
-                onWheel={(e) => e.target.blur()}
-              />
-            )}
-          </div>
-        ))}
+              </ul>
+            </div>
 
-        <button className="submit-btn" disabled={loading}>
-          {loading ? "Analyzing..." : "Submit Questionnaire"}
-        </button>
-      </form>
+            <div className="nearby-section">
+              <h4>📍 Nearby Medical Services</h4>
 
-      {error && (
-        <div className="result-box error">
-          <p>⚠️ {error}</p>
-        </div>
-      )}
-
-      {result && (
-        <div className="result-box">
-          <p>❤️ Heart Disease Risk: <strong>{result.heart}%</strong></p>
-          <p>🩸 Diabetes Risk: <strong>{result.diabetes}%</strong></p>
-          <p>🫁 Lung Health Risk (Lifestyle): <strong>{result.lung}%</strong></p>
-
-          <div style={{ marginTop: "16px" }}>
-            <h4>🩺 Personalized Health Recommendations</h4>
-            <ul style={{ paddingLeft: "18px", lineHeight: "1.6" }}>
-              {getHealthTips(result, formData).map((tip, index) => (
-                <li key={index}>{tip}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* ================= NEW LINKS ================= */}
-          <div style={{ marginTop: "20px" }}>
-            <h4>📍 Nearby Medical Services</h4>
-
-            <p>
-              🔬{" "}
               <a
                 href={getMapLink("diagnostic centre near me")}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="map-link"
               >
-                Find nearest diagnostic centre
+                🔬 Find nearest diagnostic centre
               </a>
-            </p>
 
-            <p>
-              🏥{" "}
               <a
                 href={getMapLink("hospital near me")}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="map-link"
               >
-                Find nearest hospital
+                🏥 Find nearest hospital
               </a>
-            </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

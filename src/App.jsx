@@ -1,16 +1,12 @@
 import React, { useState, useRef } from "react";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Quiz from "./components/Quiz";
 import "./styles/quiz.css";
 import cutuImg from "./assets/cutu.png";
 import MentalHealth from "./pages/MentalHealth";
 import { useLanguage } from "./LanguageContext";
+import ChatPage from "./pages/ChatPage";   // ✅ keep this
 
-
-
-
-
-/* ================= NAVBAR ================= */
 /* ================= NAVBAR ================= */
 function Navbar() {
   const { language, setLanguage, t } = useLanguage();
@@ -27,6 +23,14 @@ function Navbar() {
         <Link to="/risk">{t("navbar.risk")}</Link>
         <Link to="/mental-health">{t("navbar.mentalHealth")}</Link>
 
+        {/* ✅ NEW CHAT PAGE LINK */}
+        <Link to="/chat">AI Assistant</Link>
+
+        {/* LOGIN BUTTON */}
+        <Link to="/login" className="btn">
+          Login
+        </Link>
+
         {/* LANGUAGE DROPDOWN */}
         <select
           value={language}
@@ -35,9 +39,9 @@ function Navbar() {
             marginLeft: "12px",
             padding: "6px 8px",
             borderRadius: "6px",
-            background: "#0f172a",
-            color: "#ffffff",
-            border: "1px solid #334155",
+            background: "#f0fdf4",
+            color: "#065f46",
+            border: "1px solid #bbf7d0",
             cursor: "pointer",
           }}
         >
@@ -53,15 +57,12 @@ function Navbar() {
   );
 }
 
-
-/* ================= HOME PAGE ================= */
 /* ================= HOME PAGE ================= */
 function HomePage() {
   const { t } = useLanguage();
 
   return (
     <section className="hero">
-      {/* ================= HERO SECTION ================= */}
       <div
         style={{
           display: "flex",
@@ -80,7 +81,7 @@ function HomePage() {
 
           <p
             style={{
-              color: "#53d8fb",
+              color: "#059669",
               marginTop: "10px",
               fontWeight: "500",
             }}
@@ -102,30 +103,25 @@ function HomePage() {
         </div>
       </div>
 
-      {/* ================= FEATURE INFO CARDS (DISPLAY ONLY) ================= */}
       <div className="features info-cards">
-        {/* X-RAY */}
         <div className="feature-card">
           <span className="feature-icon">🩻</span>
           <h3>{t("features.xray.title")}</h3>
           <p>{t("features.xray.description")}</p>
         </div>
 
-        {/* RISK */}
         <div className="feature-card">
           <span className="feature-icon">📊</span>
           <h3>{t("features.risk.title")}</h3>
           <p>{t("features.risk.description")}</p>
         </div>
 
-        {/* AI CHATBOT (TEXT) */}
         <div className="feature-card">
           <span className="feature-icon">💬</span>
           <h3>{t("features.chatbot.title")}</h3>
           <p>{t("features.chatbot.description")}</p>
         </div>
 
-        {/* AI VOICE COMPANION (VOICE) */}
         <div className="feature-card">
           <span className="feature-icon">🎧</span>
           <h3>AI Voice Companion</h3>
@@ -138,19 +134,10 @@ function HomePage() {
         </div>
       </div>
 
-      {/* ================= TEXT CHATBOT (OPTIONAL) ================= */}
-      {/* This is your TEXT chatbot, NOT the voice bot */}
-      <df-messenger
-        intent="WELCOME"
-        chat-title="Aarogya AI"
-        agent-id="22591bdc-f998-476e-81c4-af92f6f54692"
-        language-code="en"
-      ></df-messenger>
+      {/* ❌ HealthChat removed from HomePage */}
     </section>
   );
 }
-
-
 
 /* ================= XRAY PAGE ================= */
 function XrayPage() {
@@ -191,13 +178,13 @@ function XrayPage() {
       let assessment, color;
       if (data.confidence >= 0.75) {
         assessment = "High likelihood of abnormality detected";
-        color = "#ff6b6b";
+        color = "#dc2626";
       } else if (data.confidence >= 0.4) {
         assessment = "Inconclusive — further evaluation recommended";
-        color = "#facc15";
+        color = "#ca8a04";
       } else {
         assessment = "No significant abnormality detected";
-        color = "#4ade80";
+        color = "#059669";
       }
 
       setResult({ confidence: data.confidence, assessment, color });
@@ -209,7 +196,7 @@ function XrayPage() {
   };
 
   return (
-    <div className="page-container">
+    <div className="xray-container">
       <h2>X-Ray Upload</h2>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
@@ -264,6 +251,16 @@ function XrayPage() {
   );
 }
 
+/* ================= LOGIN PAGE ================= */
+function LoginPage() {
+  return (
+    <div className="quiz-container">
+      <h2>Login</h2>
+      <p>Login functionality coming soon.</p>
+    </div>
+  );
+}
+
 /* ================= RISK PAGE ================= */
 function RiskPage() {
   return (
@@ -278,12 +275,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <Navbar />
-     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/xray" element={<XrayPage />} />
-      <Route path="/risk" element={<RiskPage />} />
-      <Route path="/mental-health" element={<MentalHealth />} />
-    </Routes>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/xray" element={<XrayPage />} />
+        <Route path="/risk" element={<RiskPage />} />
+        <Route path="/mental-health" element={<MentalHealth />} />
+        <Route path="/chat" element={<ChatPage />} />  {/* ✅ NEW ROUTE */}
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
     </BrowserRouter>
   );
 }
