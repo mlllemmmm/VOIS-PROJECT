@@ -1,0 +1,113 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+/* This is critical! If height is 0, the map won't show. */
+.leaflet-container {
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  margin: 20px 0;
+  border: 2px solid #334155;
+}
+
+/* Container for the whole page to handle layering */
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: #050505; /* Fallback color */
+}
+
+/* Background Video Styling */
+/* This makes the video stay in place behind everything */
+/* FORCE the video to be a background */
+.bg-video {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover !important;
+  z-index: -100 !important; /* Extremely low to stay behind everything */
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Ensure the root and wrapper are transparent */
+#root, .page-wrapper {
+  background-color: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+}
+
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+}
+
+.content-layer {
+  position: relative;
+  z-index: 10; /* Higher than the video */
+}
+
+/* This makes sure your existing Navbar doesn't have a solid background */
+.navbar {
+  background: rgba(15, 23, 42, 0.8) !important; /* Semi-transparent */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Ensuring the root and content are transparent so video shows */
+#root {
+  background: transparent !important;
+  max-width: 100% !important; /* Overriding your 1280px for a full-screen feel */
+  padding: 0;
+}
+
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
