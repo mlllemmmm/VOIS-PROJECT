@@ -10,7 +10,6 @@ import pandas as pd
 
 from flask import Flask, request, jsonify
 
-
 from dotenv import load_dotenv
 load_dotenv()
 import requests
@@ -82,9 +81,9 @@ def predict_kidney_xray():
 
     image = Image.open(request.files["file"]).convert("RGB")
     img = preprocess_image(image)
-    confidence = float(np.max(kidney_model.predict(img)))
+    #confidence = float(np.max(kidney_model.predict(img)))
 
-    return jsonify({"confidence": confidence})
+    #return jsonify({"confidence": confidence})
 # Map variables
 # Essential mapping for your Global COVID dataset
 COUNTRY_COORDS = {
