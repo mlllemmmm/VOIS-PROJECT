@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Quiz from "./components/Quiz";
 import "./styles/quiz.css";
+import "./App.css";
 import cutuImg from "./assets/cutu.png";
 import MentalHealth from "./pages/MentalHealth";
 import { useLanguage } from "./LanguageContext";
@@ -112,8 +113,6 @@ function HomePage() {
       </div>
     </section>
 
-
-    
   );
 }
 
@@ -269,58 +268,42 @@ function MapPage() {
 /* ================= APP ROOT ================= */
 function AppContent() {
   const location = useLocation();
-  
-  // Only show the global background video if we are exactly on the Home page
   const isHomePage = location.pathname === "/";
 
   return (
-    <div style={{ position: "relative", width: "100%", minHeight: "100vh" }}>
+    <div style={{ position: "relative", width: "100%", minHeight: "100vh", backgroundColor: "#0a0a0a" }}>
       
-      {/* 1. THE VIDEO: Only renders on the Home Page */}
+      {/* 1. Background Video (Only shows on Home) */}
       {isHomePage && (
         <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline
+          autoPlay loop muted playsInline
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            objectFit: "cover", 
-            zIndex: -1,
-            opacity: 0.5,
-            pointerEvents: "none",
-            objectPosition: "center center" 
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            objectFit: "cover", zIndex: 0, opacity: 0.5, pointerEvents: "none"
           }}
         >
           <source src="/home-bg.mp4" type="video/mp4" />
         </video>
       )}
-{/* 2. THE CONTENT */}
-      <div style={{ 
-        position: "relative", 
-        zIndex: 1, 
-        width: "100%",
-        padding: "0 20px" 
-      }}>
+
+      {/* 2. Main Content Layer (Z-index 1 keeps it above the video) */}
+      <div style={{ position: "relative", zIndex: 1 }}>
         <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/xray" element={<XrayPage />} />
-        <Route path="/risk" element={<RiskPage />} />
-        <Route path="/mental-health" element={<MentalHealth />} />
-        <Route path="/chat" element={<ChatPage />} />  {/* ✅ NEW ROUTE */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/map" element={<MapPage />} />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/xray" element={<XrayPage />} />
+          <Route path="/risk" element={<RiskPage />} />
+          <Route path="/mental-health" element={<MentalHealth />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/map" element={<MapPage />} />
+        </Routes>
       </div>
-      </div>
+    </div>
   );
 }
-export default function App() {
+
+function App() {
   return (
     <BrowserRouter>
       <AppContent />
@@ -328,3 +311,4 @@ export default function App() {
   );
 }
 
+export default App;

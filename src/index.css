@@ -29,6 +29,11 @@ body {
   display: block; 
 }
 
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
+
 /* 3. Layout Container */
 .shell {
   width: 100%;
