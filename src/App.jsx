@@ -3,11 +3,11 @@ import React, { useState, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Quiz from "./components/Quiz";
 import "./styles/quiz.css";
-import cutuImg from "./assets/cutu.png";
 import MentalHealth from "./pages/MentalHealth";
 import { useLanguage } from "./LanguageContext";
-import ChatPage from "./pages/ChatPage";   // ✅ keep this
+import ChatPage from "./pages/ChatPage";
 import DiseaseMap from "./components/heatmap_file";
+
 
 /* ================= NAVBAR ================= */
 function Navbar() {
@@ -25,16 +25,13 @@ function Navbar() {
         <Link to="/map">Outbreak Map</Link>
         <Link to="/risk">{t("navbar.risk")}</Link>
         <Link to="/mental-health">{t("navbar.mentalHealth")}</Link>
-
-        {/* ✅ NEW CHAT PAGE LINK */}
+        <Link to="/blood-test">Blood Test Analysis</Link>
         <Link to="/chat">AI Assistant</Link>
 
-        {/* LOGIN BUTTON */}
         <Link to="/login" className="btn">
           Login
         </Link>
 
-        {/* LANGUAGE DROPDOWN */}
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
@@ -60,62 +57,132 @@ function Navbar() {
   );
 }
 
-/* ================= HOME PAGE ================= */
 function HomePage() {
   const { t } = useLanguage();
 
   return (
-    <section className="hero">
-      <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-        <div style={{ flex: 1, minWidth: "250px" }}>
-          <h1>{t("hero.title")}</h1>
-          <div className="project-desc-container">
-            <p className="project-desc">{t("hero.description")}</p>
-            <div className="hackathon-badge">{t("hero.badge")}</div>
+    <>
+      {/* ================= HERO SECTION ================= */}
+      <section className="hero">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ flex: 1, minWidth: "250px" }}>
+            <h1 className="hero-title">{t("hero.title")}</h1>
+
+            <div className="project-desc-container">
+              <p className="project-desc">{t("hero.description")}</p>
+            </div>
+
+            <p className="hero-builtfor">{t("hero.builtFor")}</p>
           </div>
-          <p style={{ color: "#53d8fb", marginTop: "10px", fontWeight: "500" }}>
-            {t("hero.builtFor")}
-          </p>
         </div>
 
-        <div style={{ flex: 1, minWidth: "200px", textAlign: "center" }}>
-          <img src={cutuImg} alt="Health Illustration" style={{ width: "70%", maxWidth: "280px", borderRadius: "12px" }} />
+        {/* ================= FEATURES ================= */}
+        <div className="features info-cards">
+          {[
+            "xray",
+            "risk",
+            "chatbot",
+            "bloodTest",
+            "voice",
+          ].map((feature) => (
+            <div key={feature} className="feature-card">
+              <h3>{t(`features.${feature}.title`)}</h3>
+              <ul style={{ marginTop: "8px", paddingLeft: "18px" }}>
+                {t(`features.${feature}.points`).map((point, index) => (
+                  <li key={index}>{point}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-      </div>
+      </section>
 
-      <div className="features info-cards">
-        <div className="feature-card">
-          <span className="feature-icon">🩻</span>
-          <h3>{t("features.xray.title")}</h3>
-          <p>{t("features.xray.description")}</p>
-        </div>
-        <div className="feature-card">
-          <span className="feature-icon">📊</span>
-          <h3>{t("features.risk.title")}</h3>
-          <p>{t("features.risk.description")}</p>
-        </div>
-        <div className="feature-card">
-          <span className="feature-icon">💬</span>
-          <h3>{t("features.chatbot.title")}</h3>
-          <p>{t("features.chatbot.description")}</p>
-        </div>
-        <div className="feature-card">
-          <span className="feature-icon">🎧</span>
-          <h3>AI Voice Companion</h3>
-          <ul style={{ marginTop: "8px", paddingLeft: "18px" }}>
-            <li>24/7 emotional support</li>
-            <li>Judgment-free conversations</li>
-            <li>Voice-based AI companion</li>
-            <li>Available in Mental Health section</li>
-          </ul>
-        </div>
-      </div>
-    </section>
+      {/* ================= ABOUT SECTION ================= */}
+      <section className="about-section">
+        <div className="about-wrapper">
+          <div className="about-left">
+            <h2>About Aarogya AI</h2>
+            <p>
+              Aarogya AI is an AI-powered preventive healthcare platform built
+              to make early health screening accessible, affordable, and
+              intelligent.
+            </p>
+            <p>
+              Our platform integrates X-ray analysis, blood test interpretation,
+              chronic disease risk detection, and AI-based health guidance.
+            </p>
+            <p>
+              We aim to bridge healthcare gaps in underserved communities.
+            </p>
+          </div>
 
+          <div className="about-right">
+            <h2>Our Mission & Vision</h2>
+            <p>
+              Our mission is to reduce delayed diagnosis through AI-powered
+              early screening tools.
+            </p>
+            <p>
+              We envision AI supporting doctors and democratizing health
+              intelligence access.
+            </p>
+            <p>
+              Aarogya AI supports — not replaces — medical professionals.
+            </p>
+          </div>
+        </div>
+      
 
-    
+      {/* ================= FOOTER ================= */}
+      <footer className="main-footer">
+        <div className="footer-content">
+          <div className="footer-brand">
+            <h2>Aarogya AI</h2>
+            <p>
+              AI-powered preventive healthcare platform focused on early
+              detection and intelligent screening.
+            </p>
+          </div>
+
+          <div className="footer-column">
+            <h4>Company</h4>
+            <p>About Us</p>
+            <p>Careers</p>
+            <p>Contact</p>
+          </div>
+
+          <div className="footer-column">
+            <h4>Resources</h4>
+            <p>FAQs</p>
+            <p>Privacy Policy</p>
+            <p>Terms of Use</p>
+          </div>
+
+          <div className="footer-column">
+            <h4>Contact</h4>
+            <p>Email: support@aarogyaai.com</p>
+            <p>Phone: +91-XXXXXXXXXX</p>
+            <p>India</p>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          © 2026 Aarogya AI. All rights reserved.
+        </div>
+      </footer>
+      </section>
+    </>
   );
 }
+
+
 
 /* ================= XRAY PAGE ================= */
 function XrayPage() {
@@ -229,15 +296,8 @@ function XrayPage() {
   );
 }
 
-/* ================= LOGIN PAGE ================= */
-function LoginPage() {
-  return (
-    <div className="quiz-container">
-      <h2>Login</h2>
-      <p>Login functionality coming soon.</p>
-    </div>
-  );
-}
+
+
 
 /* ================= RISK PAGE ================= */
 function RiskPage() {
@@ -247,15 +307,76 @@ function RiskPage() {
     </div>
   );
 }
+/* ================= BLOOD REPORT PAGE ================= */
+function BloodTestPage() {
+  const [file, setFile] = useState(null);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleAnalyze = async () => {
+    if (!file) return alert("Please upload a PDF");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setLoading(true);
+      const response = await fetch("http://127.0.0.1:5000/analyze-blood-report", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      setResult(data);
+    } catch {
+      alert("Backend connection failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="page-container">
+      <h2>Blood Report Analysis</h2>
+
+      <input
+        type="file"
+        accept=".pdf"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+
+      <button className="btn" onClick={handleAnalyze}>
+        {loading ? "Analyzing..." : "Analyze"}
+      </button>
+
+      {result && (
+        <div style={{ marginTop: "30px" }}>
+          {Object.keys(result).map((key) => (
+            <div
+              key={key}
+              style={{
+                marginBottom: "15px",
+                padding: "15px",
+                border: "1px solid #334155",
+                borderRadius: "10px",
+              }}
+            >
+              <h4>{key}</h4>
+              <p>Value: {result[key].value}</p>
+              <p>Status: {result[key].status}</p>
+              <p>Suggestion: {result[key].suggestion}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ================= MAP PAGE ================= */
 function MapPage() {
   return (
     <div className="page-container">
       <h2 style={{ marginBottom: "20px" }}>Live Disease Outbreak Surveillance</h2>
-      <p style={{ marginBottom: "20px", color: "#94a3b8" }}>
-        This map shows real-time data of communicable diseases like Bird Flu and Influenza.
-      </p>
       <div style={{ borderRadius: "12px", overflow: "hidden", border: "1px solid #334155" }}>
         <DiseaseMap />
       </div>
@@ -263,25 +384,18 @@ function MapPage() {
   );
 }
 
-
-
-
 /* ================= APP ROOT ================= */
 function AppContent() {
   const location = useLocation();
-  
-  // Only show the global background video if we are exactly on the Home page
   const isHomePage = location.pathname === "/";
 
   return (
     <div style={{ position: "relative", width: "100%", minHeight: "100vh" }}>
-      
-      {/* 1. THE VIDEO: Only renders on the Home Page */}
       {isHomePage && (
-        <video 
-          autoPlay 
-          loop 
-          muted 
+        <video
+          autoPlay
+          loop
+          muted
           playsInline
           style={{
             position: "fixed",
@@ -289,37 +403,32 @@ function AppContent() {
             left: 0,
             width: "100vw",
             height: "100vh",
-            objectFit: "cover", 
+            objectFit: "cover",
             zIndex: -1,
-            opacity: 0.5,
-            pointerEvents: "none",
-            objectPosition: "center center" 
+            opacity: 0.85,
+            pointerEvents: "none"
           }}
         >
           <source src="/home-bg.mp4" type="video/mp4" />
         </video>
       )}
-{/* 2. THE CONTENT */}
-      <div style={{ 
-        position: "relative", 
-        zIndex: 1, 
-        width: "100%",
-        padding: "0 20px" 
-      }}>
+
+      <div style={{ position: "relative", zIndex: 1, width: "100%", padding: "0 20px" }}>
         <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/xray" element={<XrayPage />} />
-        <Route path="/risk" element={<RiskPage />} />
-        <Route path="/mental-health" element={<MentalHealth />} />
-        <Route path="/chat" element={<ChatPage />} />  {/* ✅ NEW ROUTE */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/map" element={<MapPage />} />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/xray" element={<XrayPage />} />
+          <Route path="/risk" element={<RiskPage />} />
+          <Route path="/mental-health" element={<MentalHealth />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/blood-test" element={<BloodTestPage />} />
+        </Routes>
       </div>
-      </div>
+    </div>
   );
 }
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -327,4 +436,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
