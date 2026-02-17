@@ -13,7 +13,7 @@ import pdfplumber
 import pytesseract
 from pdf2image import convert_from_path
 
-
+from tensorflow.keras.applications.efficientnet import preprocess_input
 from flask import Flask, request, jsonify
 
 from dotenv import load_dotenv
@@ -47,9 +47,9 @@ lung_xray_model = tf.keras.models.load_model(
 bones_model = tf.keras.models.load_model(
     os.path.join(BASE_DIR, "models", "best_custom_cnn.h5")
 )
-#kidney_model = tf.keras.models.load_model(
-#   os.path.join(BASE_DIR, "models", "kidney_model.keras")
-#)
+kidney_model = tf.keras.models.load_model(
+  os.path.join(BASE_DIR, "models", "kidney_stone_ct_model.h5")
+)
 
 def preprocess_image(image):
     image = image.resize((224, 224))
@@ -82,14 +82,35 @@ def predict_bones_xray():
 
 @app.route("/predict/xray/kidney", methods=["POST"])
 def predict_kidney_xray():
+
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
-    image = Image.open(request.files["file"]).convert("RGB")
-    img = preprocess_image(image)
-    #confidence = float(np.max(kidney_model.predict(img)))
+    file = request.files["file"]
 
-    #return jsonify({"confidence": confidence})
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
+        file.save(temp.name)
+
+        img = Image.open(temp.name).convert("RGB")
+        img = img.resize((224, 224))
+        img = np.array(img)
+        img = preprocess_input(img)
+        img = np.expand_dims(img, axis=0)
+
+    prediction = kidney_xray_model.predict(img)[0][0]
+
+    if prediction > 0.7:
+        result = "Likely Kidney Stone"
+    elif prediction > 0.4:
+        result = "Inconclusive"
+    else:
+        result = "Normal"
+
+    return jsonify({
+        "confidence": float(prediction),
+        "result": result
+    })
+
 # Map variables
 # Essential mapping for your Global COVID dataset
 COUNTRY_COORDS = {
@@ -321,22 +342,7 @@ def health_chat():
     except Exception as e:
         print("Groq error:", e)
         return jsonify({"reply": "Connection failed."})
-# Map variables
-# Essential mapping for your Global COVID dataset
-COUNTRY_COORDS = {
-    "US": [37.0902, -95.7129],
-    "India": [20.5937, 78.9629],
-    "Brazil": [-14.2350, -51.9253],
-    "Russia": [61.5240, 105.3188],
-    "France": [46.2276, 2.2137],
-    "UK": [55.3781, -3.4360],
-    "Italy": [41.8719, 12.5674],
-    "Spain": [40.4637, -3.7492],
-    "Germany": [51.1657, 10.4515],
-    "Turkey": [38.9637, 35.2433],
-    "China": [35.8617, 104.1954],
-    "Mainland China": [35.8617, 104.1954] # Matches your Kaggle cleaning logic
-}
+
 def preprocess_image(image):
     image = image.resize((224, 224))
     image = np.array(image) / 255.0
